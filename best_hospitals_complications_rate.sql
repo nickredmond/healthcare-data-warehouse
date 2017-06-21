@@ -1,33 +1,5 @@
 use hospital_warehouse;
 
-SET @better_measures_count = (SELECT COUNT(*) FROM measure WHERE relative_to_natl_avg = 'BETTER');
-SET @worse_measures_count = (SELECT COUNT(*) FROM measure WHERE relative_to_natl_avg = 'WORSE');
-SET @hospitals_count = (SELECT COUNT(*) FROM hospital);
-SET @measures_count = (SELECT COUNT(*) FROM measure WHERE relative_to_natl_avg = 'BETTER' OR
-	relative_to_natl_avg = 'SAME' OR
-    relative_to_natl_avg = 'WORSE');
-    
-SET @smallest_measures_count = (
-	SELECT MIN((
-		SELECT COUNT(*) FROM measure m
-		INNER JOIN hospital h
-		ON m.hospital_id = h.id
-		INNER JOIN location loc
-		ON h.location_id = loc.id
-        GROUP BY loc.state
-	))
-);
-SET @largest_measures_count = (
-	SELECT MAX((
-		SELECT COUNT(*) FROM measure m
-		INNER JOIN hospital h
-		ON m.hospital_id = h.id
-		INNER JOIN location loc
-		ON h.location_id = loc.id
-        GROUP BY loc.state
-	))
-);
-
 DROP VIEW hospital_complications_ratings;
 CREATE VIEW hospital_complications_ratings (state, total_score, percentage_rated, ratings_count, percentage_worse,
 		percentage_same, percentage_better, bad_marks, good_marks, great_marks)
@@ -94,5 +66,5 @@ CREATE VIEW hospital_complications_ratings (state, total_score, percentage_rated
 	GROUP BY loc.state;
     
 SELECT * FROM hospital_complications_ratings
-WHERE total_score IS NOT NULL AND percentage_rated >= 25
+WHERE total_score IS NOT NULL AND percentage_rated >= 15
 ORDER BY total_score DESC, percentage_rated DESC; 
